@@ -6,6 +6,7 @@ public class test {
     MoteurJeu m = new MoteurJeu(10,10);
     m.initialiserGrille();
     m.remplirJusquaMotFinal();
+    m.insererMotFinal();
     m.afficherGrille();
   }
 }

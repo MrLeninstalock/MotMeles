@@ -25,7 +25,7 @@ public class MoteurJeu {
       nombreMotPossible++;
     }
     br.close();
-    motFinal = "TEST";
+    motFinal = "1234";
   }
 
   public String lireMot() throws IOException {
@@ -343,5 +343,19 @@ public class MoteurJeu {
       }
     }
     return espaceLibre;
+  }
+
+  public void insererMotFinal() {
+    char[] tab = new char[motFinal.toCharArray().length];
+    tab=motFinal.toCharArray();
+    int k=0;
+    for(int i =0; i<this.longueur-1; i++) {
+      for(int j = 0; j<this.largeur-1; j++) {
+        if(plateau[i][j]=='-') {
+          plateau[i][j]=tab[k];
+          k++;
+        }
+      }
+    }
   }
 }
