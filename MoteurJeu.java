@@ -11,6 +11,8 @@ public class MoteurJeu {
   int lower = 97;
   int higher = 122;
 
+  String motFinal;
+
   public MoteurJeu(int longueur, int largeur) throws IOException{
     nombreMotPossible = 0;
     String line;
@@ -23,6 +25,7 @@ public class MoteurJeu {
       nombreMotPossible++;
     }
     br.close();
+    motFinal = "TEST";
   }
 
   public String lireMot() throws IOException {
@@ -156,7 +159,43 @@ public class MoteurJeu {
     return false;
   }
 
+  public boolean leMotPeutEtreEcritSansEcrire(String mot, int orientation, int x, int y) {
+    char[] tab = mot.toCharArray();
+    if(!motNeDepassePas(tab, orientation, x, y)) {
+      return false;
+    }
+    if(orientation == 1) {
+      for(int i=0; i<tab.length; i++) {
+        if(plateau[x][y+i] == tab[i] || plateau[x][y+i] == '-') {
+        } else {
+          return false;
+        }
+      }
+      return true;
+    } else if (orientation == 2) {
+      for(int i=0; i<tab.length; i++) {
+        if(plateau[x+i][y] == tab[i] || plateau[x+i][y] == '-') {
+        } else {
+          return false;
+        }
+      }
+      return true;
+    } else if (orientation == 3) {
+      for(int i=0; i<tab.length; i++) {
+        if(plateau[x+i][y+i] == tab[i] || plateau[x+i][y+i] == '-') {
+        } else {
+          return false;
+        }
+      }
+      return true;
+    }
+    return false;
+  }
+
   public void remplirDeMots(int nombreDeMots) throws IOException{
+    if(nombreDeMots==0) {
+      nombreDeMots=999;
+    }
     while(grilleNonRemplie()) {
       if(placerMotHasard(lireMot())) {
         nombreDeMots--;
@@ -182,7 +221,6 @@ public class MoteurJeu {
         plateau[x+i][y+i]=tab[i];
       }
     } else {
-      System.out.println("MAUVAISE ORIENTATION");
     }
   }
 
@@ -207,5 +245,103 @@ public class MoteurJeu {
         }
       }
     }
+  }
+
+  public int[] placerMotOrdonneReturnCoord(String mot) {
+    int[] res = new int[4];
+    int place;
+    res[3] = 4;
+    for(int i =0; i<this.longueur-1; i++) {
+      for(int j = 0; j<this.largeur-1; j++) {
+        if(leMotPeutEtreEcritSansEcrire(mot, 1, i, j)) {
+          res[0]=compterPlacePrise(1, mot.toCharArray(), i, j);
+          res[1]=i;
+          res[2]=j;
+          res[3]=1;
+          return res;
+        }
+        if(leMotPeutEtreEcritSansEcrire(mot, 2, i, j)) {
+          res[0]=compterPlacePrise(2, mot.toCharArray(), i, j);
+          res[1]=i;
+          res[2]=j;
+          res[3]=2;
+          return res;
+        }
+        if(leMotPeutEtreEcritSansEcrire(mot, 3, i, j)) {
+          res[0]=compterPlacePrise(3, mot.toCharArray(), i, j);
+          res[1]=i;
+          res[2]=j;
+          res[3]=3;
+          return res;
+        }
+      }
+    }
+    return res;
+  }
+
+  public int compterPlacePrise(int orientation, char[] tab, int x, int y) {
+    int place=0;
+    if(orientation == 1) {
+      for(int i=0; i<tab.length; i++) {
+        if(plateau[x][y+i]!=tab[i]) {
+          place++;
+        }
+      }
+      return place;
+    } else if(orientation == 2) {
+      for(int i=0; i<tab.length; i++) {
+        if(plateau[x+i][y]!=tab[i]) {
+          place++;
+        }
+      }
+      return place;
+    } else if(orientation == 3) {
+      for(int i=0; i<tab.length; i++) {
+        if(plateau[x+i][y+i]!=tab[i]) {
+          place++;
+        }
+      }
+      return place;
+    } else {
+      System.out.println("MAUVAISE ORIENTATION");
+    }
+    return -1;
+  }
+
+  public void remplirJusquaMotFinal()  throws IOException{
+    String mot ="";
+    int[] tab = new int[4];
+    boolean first = true;
+    while(nombrePlaceRestante() != motFinal.toCharArray().length) {
+      mot = lireMot();
+      tab = placerMotOrdonneReturnCoord(mot);
+      while(tab[3]==4) {
+        mot = lireMot();
+        tab = placerMotOrdonneReturnCoord(mot);
+      }
+      if(tab[0] <= nombrePlaceRestante() - motFinal.toCharArray().length) {
+        ecrireMot(tab[3], mot.toCharArray(), tab[1], tab[2]);
+      }
+    }
+  }
+
+  public boolean ilResteLaPlacePourLeMot() {
+    int tailleMot = motFinal.toCharArray().length;
+    if(nombrePlaceRestante()==tailleMot) {
+      return true;
+    }
+    return false;
+  }
+
+  public int nombrePlaceRestante() {
+    int espaceLibre =0;
+    for(int i =0; i<this.longueur-1; i++) {
+      for(int j = 0; j<this.largeur-1; j++) {
+        if(plateau[i][j]=='-') {
+          espaceLibre++;
+        }
+      }
+    }
+    return espaceLibre;
   }
 }
