@@ -7,6 +7,6 @@ public class test {
     m.initialiserGrille();
     m.remplirJusquaMotFinal();
     m.insererMotFinal();
-    m.afficherGrille();
+    m.afficherIG();
   }
 }

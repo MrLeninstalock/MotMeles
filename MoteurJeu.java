@@ -16,9 +16,9 @@ public class MoteurJeu {
   public MoteurJeu(int longueur, int largeur) throws IOException{
     nombreMotPossible = 0;
     String line;
-    this.longueur = longueur;
-    this.largeur = largeur;
-    this.plateau = new char[longueur][largeur];
+    this.longueur = longueur+1;
+    this.largeur = largeur+1;
+    this.plateau = new char[this.longueur][this.largeur];
     File f = new File("dico.txt");
     BufferedReader br = new BufferedReader(new FileReader(f));
     while ((line = br.readLine()) != null) {
@@ -77,7 +77,7 @@ public class MoteurJeu {
     int orientation = (int)(Math.random() * 3)+1;
     for(int i =0; i<this.longueur-1; i++) {
       for(int j = 0; j<this.largeur-1; j++) {
-        if(leMotPeutEtreEcrit(mot, orientation, i, j)) {
+        if(verifierEtEcrireMot(mot, orientation, i, j)) {
           return true;
         }
       }
@@ -95,7 +95,7 @@ public class MoteurJeu {
     int j = (int)(Math.random() *largeur);
     int nombreTentative = 0;
     int nombreTentativeMax = longueur*largeur;
-    while(!leMotPeutEtreEcrit(mot, orientation, i, j)) {
+    while(!verifierEtEcrireMot(mot, orientation, i, j)) {
       i = (int)(Math.random() *longueur);
       j = (int)(Math.random() *largeur);
       nombreTentative++;
@@ -123,7 +123,7 @@ public class MoteurJeu {
     return true;
   }
 
-  public boolean leMotPeutEtreEcrit(String mot, int orientation, int x, int y) {
+  public boolean verifierEtEcrireMot(String mot, int orientation, int x, int y) {
     char[] tab = mot.toCharArray();
     if(!motNeDepassePas(tab, orientation, x, y)) {
       return false;
@@ -135,7 +135,7 @@ public class MoteurJeu {
           return false;
         }
       }
-      ecrireMot(1, tab, x, y);
+      mettreMot(1, tab, x, y);
       return true;
     } else if (orientation == 2) {
       for(int i=0; i<tab.length; i++) {
@@ -144,7 +144,7 @@ public class MoteurJeu {
           return false;
         }
       }
-      ecrireMot(2, tab, x, y);
+      mettreMot(2, tab, x, y);
       return true;
     } else if (orientation == 3) {
       for(int i=0; i<tab.length; i++) {
@@ -153,7 +153,7 @@ public class MoteurJeu {
           return false;
         }
       }
-      ecrireMot(3, tab, x, y);
+      mettreMot(3, tab, x, y);
       return true;
     }
     return false;
@@ -206,7 +206,7 @@ public class MoteurJeu {
     }
   }
 
-  public void ecrireMot(int orientation, char[] tab, int x, int y) {
+  public void mettreMot(int orientation, char[] tab, int x, int y) {
     System.out.println("On a mis le mot " + new String(tab));
     if(orientation == 1) {
       for(int i=0; i<tab.length; i++) {
@@ -279,6 +279,8 @@ public class MoteurJeu {
     return res;
   }
 
+
+
   public int compterPlacePrise(int orientation, char[] tab, int x, int y) {
     int place=0;
     if(orientation == 1) {
@@ -320,7 +322,7 @@ public class MoteurJeu {
         tab = placerMotOrdonneReturnCoord(mot);
       }
       if(tab[0] <= nombrePlaceRestante() - motFinal.toCharArray().length) {
-        ecrireMot(tab[3], mot.toCharArray(), tab[1], tab[2]);
+        mettreMot(tab[3], mot.toCharArray(), tab[1], tab[2]);
       }
     }
   }
@@ -357,5 +359,10 @@ public class MoteurJeu {
         }
       }
     }
+  }
+
+  public void afficherIG() {
+    Fenetre fen = new Fenetre(longueur, largeur, plateau);
+    fen.initialiserFenetre();
   }
 }
