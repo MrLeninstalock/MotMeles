@@ -1,5 +1,6 @@
 import java.lang.Math;
 import java.io.*;
+import java.util.*;
 
 public class MoteurJeu {
 
@@ -11,6 +12,8 @@ public class MoteurJeu {
   int lower = 97;
   int higher = 122;
 
+  private LinkedList<Mot> liste;
+
   String motFinal;
 
   public MoteurJeu(int longueur, int largeur) throws IOException{
@@ -21,6 +24,7 @@ public class MoteurJeu {
     this.plateau = new char[this.longueur][this.largeur];
     File f = new File("dico.txt");
     BufferedReader br = new BufferedReader(new FileReader(f));
+    liste = new LinkedList<Mot>();
     while ((line = br.readLine()) != null) {
       nombreMotPossible++;
     }
@@ -208,6 +212,7 @@ public class MoteurJeu {
 
   public void mettreMot(int orientation, char[] tab, int x, int y) {
     System.out.println("On a mis le mot " + new String(tab));
+    liste.add(new Mot(new String(tab), x, y, orientation));
     if(orientation == 1) {
       for(int i=0; i<tab.length; i++) {
         plateau[x][y+i]=tab[i];
@@ -362,7 +367,7 @@ public class MoteurJeu {
   }
 
   public void afficherIG() {
-    Fenetre fen = new Fenetre(longueur, largeur, plateau);
+    Fenetre fen = new Fenetre(longueur, largeur, plateau, liste);
     fen.initialiserFenetre();
   }
 }
