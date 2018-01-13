@@ -164,6 +164,9 @@ public class MoteurJeu {
   }
 
   public boolean leMotPeutEtreEcritSansEcrire(String mot, int orientation, int x, int y) {
+    if(mot==null) {
+      return false;
+    }
     char[] tab = mot.toCharArray();
     if(!motNeDepassePas(tab, orientation, x, y)) {
       return false;
@@ -370,4 +373,6 @@ public class MoteurJeu {
     Fenetre fen = new Fenetre(longueur, largeur, plateau, liste);
     fen.initialiserFenetre();
   }
+
+
 }

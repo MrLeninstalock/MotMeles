@@ -18,10 +18,10 @@ public class Fenetre implements MouseListener {
   private JPanel pan;
 
   private boolean premierClick;
-  private int Ox;
-  private int Oy;
-  private int Dx;
-  private int Dy;
+  private int AbscisseOrigine;
+  private int AbscisseDestination;
+  private int OrdonneOrigine;
+  private int OrdonneDestination;
 
 
 
@@ -94,24 +94,23 @@ public class Fenetre implements MouseListener {
 
    public void mouseClicked(MouseEvent e) {
      JTextField tmp = (JTextField)e.getSource();
+     int abscisse, ordonne, lacase, locase;
      if(premierClick) {
-       int x, y, lacase, locase;
+
        lacase = pan.getWidth()/longueur;
        locase = pan.getHeight()/largeur;
-       x = (e.getX()+tmp.getX())/lacase;
-       y = (e.getY()+tmp.getY())/locase;
-       Ox = x;
-       Oy = y;
-       System.out.println("Case : "+x+" "+y);
+       abscisse =(e.getX()+tmp.getX())/lacase;
+       ordonne =(e.getY()+tmp.getY())/locase;
+       AbscisseOrigine = abscisse;
+       OrdonneOrigine = ordonne;
        premierClick = false;
      } else {
-       int dx, dy, lacase, locase;
        lacase = pan.getWidth()/longueur;
        locase = pan.getHeight()/largeur;
-       x = (e.getX()+tmp.getX())/lacase;
-       y = (e.getY()+tmp.getY())/locase;
-       Dx = x;
-       Dy = y;
+       abscisse =(e.getX()+tmp.getX())/lacase;
+       ordonne =(e.getY()+tmp.getY())/locase;
+       AbscisseDestination = abscisse;
+       OrdonneDestination = ordonne;
        if(verifierClick()) {
          verifierMot();
        }
@@ -119,19 +118,70 @@ public class Fenetre implements MouseListener {
    }
 
    public boolean verifierClick() {
-     if(Ox!=Dx && Oy!=Dy) {
-       if((Dx-Ox)==(Dy-Do)) {
+     if(AbscisseOrigine!=AbscisseDestination && OrdonneOrigine!=OrdonneDestination) {
+       if((AbscisseOrigine-AbscisseDestination)==(OrdonneDestination-OrdonneOrigine)) {
          return true;
        }
      }
+     return true;
    }
 
    public boolean verifierMot() {
      String mot ="";
-     if(Ox==Dx && Oy!=Dy) {
-       for(int i=0; i<Dx-Ox; i++) {
-         mot+=plateau[Ox+i][Oy];
+     int i;
+     int longueurMot;
+     if(AbscisseOrigine==AbscisseDestination && OrdonneOrigine!=OrdonneDestination) {
+       longueurMot = OrdonneDestination-OrdonneOrigine+1;
+       for(i=0; i<longueurMot; i++) {
+         mot+=plateau[OrdonneOrigine+i][AbscisseOrigine];
+       }
+       System.out.println("Mot trouvé :"+mot);
+       for(i =0; i<liste.size(); i++) {
+         if(mot.equals(liste.get(i).getMot())) {
+           System.out.println("On a trouvé un mot !");
+           premierClick=true;
+           validerMot(i);
+           return true;
+         }
+       }
+       System.out.println("Non ce n'est pas un mot valide !");
+       premierClick=true;
+       return false;
+     } else if(AbscisseOrigine!=AbscisseDestination && OrdonneOrigine==OrdonneDestination) {
+       longueurMot = AbscisseDestination-AbscisseOrigine+1;
+       System.out.println(longueurMot);
+       for(i=0; i<longueurMot; i++) {
+         mot+=plateau[OrdonneOrigine][AbscisseOrigine+i];
+       }
+       System.out.println("Mot trouvé :"+mot);
+       for(i =0; i<liste.size(); i++) {
+         System.out.println(liste.get(i).getMot());
+         if(mot.equals(liste.get(i).getMot())) {
+           System.out.println("On a trouvé un mot !");
+           premierClick=true;
+           validerMot(i);
+           return true;
+         }
+       }
+       System.out.println("Non ce n'est pas un mot valide !");
+       premierClick=true;
+       return false;
+     }
+     return false;
+   }
+
+   public void validerMot(int index) {
+     Mot mot = liste.get(index);
+     mot.check();
+     if(mot.getOrientation() == 1){
+       for(int i=0; i<mot.getTaille(); i++) {
+         tabTextField[mot.getX() * largeur + mot.getY()+i].setBackground(new Color (128, 128, 0));
+       }
+     } else if(mot.getOrientation() == 2) {
+       for(int i=0; i<mot.getTaille(); i++) {
+         tabTextField[(mot.getX()+i) * largeur + mot.getY()].setBackground(new Color (128, 128, 0));
        }
      }
    }
+
 }

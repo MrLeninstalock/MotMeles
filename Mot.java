@@ -4,12 +4,14 @@ public class Mot {
   private int x;
   private int y;
   private int orientation;
+  private boolean check;
 
   public Mot(String m, int i, int j, int o) {
     mot = m;
     x = i;
     y = j;
     orientation = o;
+    check = false;
   }
 
   public String getMot() {
@@ -30,5 +32,9 @@ public class Mot {
 
   public int getTaille() {
     return this.mot.toCharArray().length;
+  }
+
+  public void check() {
+    check = true;
   }
 }
