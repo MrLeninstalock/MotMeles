@@ -26,6 +26,11 @@ public class Fenetre implements MouseListener {
   private double tempsDebut;
   private double tempsFin;
 
+  private boolean sensInverse;
+  private boolean motHorizontal;
+  private boolean hautGaucheBasDroit;
+  private boolean motDiagonal;
+
 
   public Fenetre(int longe, int larg, char[][] tab, LinkedList<Mot> listeMot)  {
     tempsDebut = System.currentTimeMillis();
@@ -121,13 +126,43 @@ public class Fenetre implements MouseListener {
   }
 
   public boolean verifierClick() {
-   if(AbscisseOrigine!=AbscisseDestination && OrdonneOrigine!=OrdonneDestination) {
-     if((AbscisseOrigine-AbscisseDestination)==(OrdonneDestination-OrdonneOrigine)) {
-       return true;
-     } else {
-       return false;
-     }
-   }
+    if(AbscisseDestination != AbscisseOrigine && OrdonneOrigine == OrdonneDestination) { //MOT HORIZONTAL
+      motHorizontal = true;
+      motDiagonal = false;
+      if(AbscisseDestination < AbscisseOrigine) { //INVERSE
+        System.out.println("Mot Horizontal inverse");
+        sensInverse = true;
+      } else { // NORMAL
+        sensInverse = false;
+        System.out.println("Mot Horizontal");
+      }
+    } else if(AbscisseDestination == AbscisseOrigine && OrdonneDestination != OrdonneOrigine) { //MOT VERTICAL
+      motHorizontal = false;
+      motDiagonal = false;
+      if(OrdonneDestination < OrdonneOrigine) { //INVERSE
+        sensInverse = true;
+      } else {
+        sensInverse = false;
+      }
+    } else if(AbscisseDestination != AbscisseOrigine && OrdonneDestination != OrdonneOrigine) { //MOT DIAGONAL
+      motDiagonal = true;
+      motHorizontal = false;
+      if(AbscisseDestination < AbscisseOrigine && OrdonneDestination < OrdonneOrigine) {
+        sensInverse = true;
+        hautGaucheBasDroit = true;
+      } else if(AbscisseDestination < AbscisseOrigine && OrdonneDestination > OrdonneOrigine) {
+        sensInverse = true;
+        hautGaucheBasDroit = false;
+      } else if(AbscisseDestination > AbscisseOrigine && OrdonneDestination < OrdonneOrigine) {
+        sensInverse = false;
+        hautGaucheBasDroit = false;
+      } else if(AbscisseDestination > AbscisseOrigine && OrdonneDestination > OrdonneOrigine) {
+        sensInverse = false;
+        hautGaucheBasDroit = true;
+      } else {
+        return false;
+      }
+    }
    return true;
   }
 
@@ -152,6 +187,7 @@ public class Fenetre implements MouseListener {
   public boolean motExiste(String mot) {
    int i;
    for(i =0; i<liste.size(); i++) {
+     System.out.println(liste.get(i).getMot());
      if(mot.equals(liste.get(i).getMot())) {
        System.out.println("On a trouvé un mot !");
        premierClick=true;
@@ -164,20 +200,41 @@ public class Fenetre implements MouseListener {
    return false;
   }
 
+  public void inverserOrigineDestination() {
+    int tmp;
+    tmp = AbscisseOrigine;
+    AbscisseOrigine = AbscisseDestination;
+    AbscisseDestination = tmp;
+
+    tmp = OrdonneOrigine;
+    OrdonneOrigine = OrdonneDestination;
+    OrdonneDestination = tmp;
+  }
+
   public String collecterMotHorizontal() {
    int i;
-   int longueurMot = AbscisseDestination-AbscisseOrigine+1;
    String mot = "";
+   if(sensInverse) {
+     System.out.println("On va collectr un mot inversé");
+     inverserOrigineDestination();
+   }
+   int longueurMot = AbscisseDestination-AbscisseOrigine+1;
+
    for(i=0; i<longueurMot; i++) {
      mot+=plateau[OrdonneOrigine][AbscisseOrigine+i];
    }
+   System.out.println("Mot collecté :"+mot);
    return mot;
   }
 
   public String collecterMotVertical() {
    String mot = "";
    int i;
+   if(sensInverse) {
+     inverserOrigineDestination();
+   }
    int longueurMot = OrdonneDestination-OrdonneOrigine+1;
+
    for(i=0; i<longueurMot; i++) {
      mot+=plateau[OrdonneOrigine+i][AbscisseOrigine];
    }
@@ -187,23 +244,38 @@ public class Fenetre implements MouseListener {
   public String collecterMotDiagonal() {
    String mot = "";
    int i;
-   int longueurMot = OrdonneDestination-OrdonneOrigine+1;
-   for(i=0; i<longueurMot; i++) {
-     mot+=plateau[OrdonneOrigine+i][AbscisseOrigine+i];
+   if(hautGaucheBasDroit) {
+     if(sensInverse) {
+       inverserOrigineDestination();
+     }
+     int longueurMot = OrdonneDestination-OrdonneOrigine+1;
+     for(i=0; i<longueurMot; i++) {
+       mot+=plateau[OrdonneOrigine+i][AbscisseOrigine+i];
+     }
+   } else {
+     if(sensInverse) {
+       inverserOrigineDestination();
+     }
+     int longueurMot = OrdonneDestination-OrdonneOrigine+1;
+     for(i=0; i<longueurMot; i++) {
+       mot+=plateau[OrdonneOrigine-i][AbscisseOrigine+i];
+     }
    }
+
    return mot;
   }
 
   public boolean verifierMot() {
-   String mot ="";
-   if(motHorizontal()) {
+   String mot = "";
+   if(motHorizontal) {
+     System.out.println("On va vérifier un mot horizontal");
      mot = collecterMotHorizontal();
      if(motExiste(mot)) {
        return true;
      } else {
        return false;
      }
-   } else if(motVertical()) {
+   } else if(!motHorizontal && !motDiagonal) {
      mot = collecterMotVertical();
      if(motExiste(mot)) {
        return true;

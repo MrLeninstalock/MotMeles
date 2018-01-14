@@ -5,13 +5,15 @@ public class Mot {
   private int y;
   private int orientation;
   private boolean check;
+  private int sens; //if 0, normal. If 1, reverse.
 
-  public Mot(String m, int i, int j, int o) {
+  public Mot(String m, int i, int j, int o, int s) {
     mot = m;
     x = i;
     y = j;
     orientation = o;
     check = false;
+    sens = s;
   }
 
   public String getMot() {

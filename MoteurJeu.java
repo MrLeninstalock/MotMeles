@@ -12,6 +12,8 @@ public class MoteurJeu {
   int lower = 97;
   int higher = 122;
 
+  private int sens;
+
   private LinkedList<Mot> liste;
 
   String motFinal;
@@ -42,6 +44,15 @@ public class MoteurJeu {
       i++;
     }
     br.close();
+    if(Math.random() < 0.5) {
+      sens=0;
+    } else {
+      sens=1;
+      char[] tab = new char[line.toCharArray().length];
+      tab = line.toCharArray();
+      tab= inverserTab(tab);
+      line = new String(tab);
+    }
     return line;
   }
 
@@ -215,7 +226,7 @@ public class MoteurJeu {
 
   public void mettreMot(int orientation, char[] tab, int x, int y) {
     System.out.println("On a mis le mot " + new String(tab));
-    liste.add(new Mot(new String(tab), x, y, orientation));
+    liste.add(new Mot(new String(tab), x, y, orientation, sens));
     if(orientation == 1) {
       for(int i=0; i<tab.length; i++) {
         plateau[x][y+i]=tab[i];
@@ -286,8 +297,6 @@ public class MoteurJeu {
     }
     return res;
   }
-
-
 
   public int compterPlacePrise(int orientation, char[] tab, int x, int y) {
     int place=0;
@@ -374,5 +383,22 @@ public class MoteurJeu {
     fen.initialiserFenetre();
   }
 
+  public char[] inverserTab(char[] tab) {
+    char tmp;
+    for(int i=0; i<tab.length/2; i++) {
+      tmp = tab[i];
+      tab[i] = tab[tab.length-i-1];
+      tab[tab.length-1-i] = tmp;
+    }
+    afficherTab(tab);
+    return tab;
+  }
+
+  public void afficherTab(char[] tab){
+    for(int i=0; i<tab.length; i++) {
+      System.out.print(tab[i]);
+    }
+    System.out.println("");
+  }
 
 }
