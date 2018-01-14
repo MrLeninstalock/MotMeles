@@ -23,9 +23,12 @@ public class Fenetre implements MouseListener {
   private int OrdonneOrigine;
   private int OrdonneDestination;
 
+  private double tempsDebut;
+  private double tempsFin;
 
 
   public Fenetre(int longe, int larg, char[][] tab, LinkedList<Mot> listeMot)  {
+    tempsDebut = System.currentTimeMillis();
     this.longueur=longe-1;
     this.largeur=larg-1;
     premierClick = true;
@@ -171,7 +174,7 @@ public class Fenetre implements MouseListener {
    return mot;
   }
 
-  public String collerMotVertical() {
+  public String collecterMotVertical() {
    String mot = "";
    int i;
    int longueurMot = OrdonneDestination-OrdonneOrigine+1;
@@ -181,7 +184,7 @@ public class Fenetre implements MouseListener {
    return mot;
   }
 
-  public String collerMotDiagonal() {
+  public String collecterMotDiagonal() {
    String mot = "";
    int i;
    int longueurMot = OrdonneDestination-OrdonneOrigine+1;
@@ -201,14 +204,14 @@ public class Fenetre implements MouseListener {
        return false;
      }
    } else if(motVertical()) {
-     mot = collerMotVertical();
+     mot = collecterMotVertical();
      if(motExiste(mot)) {
        return true;
      } else {
        return false;
      }
    } else {
-     mot = collerMotDiagonal();
+     mot = collecterMotDiagonal();
      if(motExiste(mot)) {
        return true;
      } else {
@@ -219,7 +222,6 @@ public class Fenetre implements MouseListener {
 
   public void validerMot(int index) {
      Mot mot = liste.get(index);
-     mot.check();
      if(mot.getOrientation() == 1){
        for(int i=0; i<mot.getTaille(); i++) {
          tabTextField[mot.getX() * largeur + mot.getY()+i].setBackground(new Color (128, 128, 0));
@@ -233,6 +235,20 @@ public class Fenetre implements MouseListener {
          tabTextField[(mot.getX()+i) * largeur + mot.getY()+i].setBackground(new Color (128, 128, 0));
        }
      }
+     retirerMotListe(index);
+   }
+
+   public void retirerMotListe(int index) {
+     liste.remove(index);
+     if(liste.size()==0) {
+       gagner();
+     }
+   }
+
+   public void gagner() {
+     System.out.println("GG mon ptit pote !");
+     tempsFin = System.currentTimeMillis();
+     System.out.println("Tu as mis :"+ (tempsFin - tempsDebut)/1000+"s");
    }
 
 }
