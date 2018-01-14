@@ -81,96 +81,143 @@ public class Fenetre implements MouseListener {
   }
 
   public void mousePressed(MouseEvent e) {
+  }
+
+  public void mouseReleased(MouseEvent e) {
+  }
+
+  public void mouseEntered(MouseEvent e) {
+  }
+
+  public void mouseExited(MouseEvent e) {
+  }
+
+  public void mouseClicked(MouseEvent e) {
+   JTextField tmp = (JTextField)e.getSource();
+   int abscisse, ordonne, lacase, locase;
+   if(premierClick) {
+
+     lacase = pan.getWidth()/longueur;
+     locase = pan.getHeight()/largeur;
+     abscisse =(e.getX()+tmp.getX())/lacase;
+     ordonne =(e.getY()+tmp.getY())/locase;
+     AbscisseOrigine = abscisse;
+     OrdonneOrigine = ordonne;
+     premierClick = false;
+   } else {
+     lacase = pan.getWidth()/longueur;
+     locase = pan.getHeight()/largeur;
+     abscisse =(e.getX()+tmp.getX())/lacase;
+     ordonne =(e.getY()+tmp.getY())/locase;
+     AbscisseDestination = abscisse;
+     OrdonneDestination = ordonne;
+     if(verifierClick()) {
+       verifierMot();
+     }
    }
+  }
 
-   public void mouseReleased(MouseEvent e) {
-   }
-
-   public void mouseEntered(MouseEvent e) {
-   }
-
-   public void mouseExited(MouseEvent e) {
-   }
-
-   public void mouseClicked(MouseEvent e) {
-     JTextField tmp = (JTextField)e.getSource();
-     int abscisse, ordonne, lacase, locase;
-     if(premierClick) {
-
-       lacase = pan.getWidth()/longueur;
-       locase = pan.getHeight()/largeur;
-       abscisse =(e.getX()+tmp.getX())/lacase;
-       ordonne =(e.getY()+tmp.getY())/locase;
-       AbscisseOrigine = abscisse;
-       OrdonneOrigine = ordonne;
-       premierClick = false;
+  public boolean verifierClick() {
+   if(AbscisseOrigine!=AbscisseDestination && OrdonneOrigine!=OrdonneDestination) {
+     if((AbscisseOrigine-AbscisseDestination)==(OrdonneDestination-OrdonneOrigine)) {
+       return true;
      } else {
-       lacase = pan.getWidth()/longueur;
-       locase = pan.getHeight()/largeur;
-       abscisse =(e.getX()+tmp.getX())/lacase;
-       ordonne =(e.getY()+tmp.getY())/locase;
-       AbscisseDestination = abscisse;
-       OrdonneDestination = ordonne;
-       if(verifierClick()) {
-         verifierMot();
-       }
-     }
-   }
-
-   public boolean verifierClick() {
-     if(AbscisseOrigine!=AbscisseDestination && OrdonneOrigine!=OrdonneDestination) {
-       if((AbscisseOrigine-AbscisseDestination)==(OrdonneDestination-OrdonneOrigine)) {
-         return true;
-       }
-     }
-     return true;
-   }
-
-   public boolean verifierMot() {
-     String mot ="";
-     int i;
-     int longueurMot;
-     if(AbscisseOrigine==AbscisseDestination && OrdonneOrigine!=OrdonneDestination) {
-       longueurMot = OrdonneDestination-OrdonneOrigine+1;
-       for(i=0; i<longueurMot; i++) {
-         mot+=plateau[OrdonneOrigine+i][AbscisseOrigine];
-       }
-       System.out.println("Mot trouvé :"+mot);
-       for(i =0; i<liste.size(); i++) {
-         if(mot.equals(liste.get(i).getMot())) {
-           System.out.println("On a trouvé un mot !");
-           premierClick=true;
-           validerMot(i);
-           return true;
-         }
-       }
-       System.out.println("Non ce n'est pas un mot valide !");
-       premierClick=true;
-       return false;
-     } else if(AbscisseOrigine!=AbscisseDestination && OrdonneOrigine==OrdonneDestination) {
-       longueurMot = AbscisseDestination-AbscisseOrigine+1;
-       System.out.println(longueurMot);
-       for(i=0; i<longueurMot; i++) {
-         mot+=plateau[OrdonneOrigine][AbscisseOrigine+i];
-       }
-       System.out.println("Mot trouvé :"+mot);
-       for(i =0; i<liste.size(); i++) {
-         System.out.println(liste.get(i).getMot());
-         if(mot.equals(liste.get(i).getMot())) {
-           System.out.println("On a trouvé un mot !");
-           premierClick=true;
-           validerMot(i);
-           return true;
-         }
-       }
-       System.out.println("Non ce n'est pas un mot valide !");
-       premierClick=true;
        return false;
      }
-     return false;
    }
+   return true;
+  }
 
-   public void validerMot(int index) {
+  public boolean motVertical() {
+    if(AbscisseOrigine==AbscisseDestination && OrdonneOrigine!=OrdonneDestination) {
+      System.out.println("Mot vertical");
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  public boolean motHorizontal() {
+    if(AbscisseOrigine!=AbscisseDestination && OrdonneOrigine==OrdonneDestination) {
+      System.out.println("Mot horizontal");
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  public boolean motExiste(String mot) {
+   int i;
+   for(i =0; i<liste.size(); i++) {
+     if(mot.equals(liste.get(i).getMot())) {
+       System.out.println("On a trouvé un mot !");
+       premierClick=true;
+       validerMot(i);
+       return true;
+     }
+   }
+   System.out.println("Non ce n'est pas un mot valide !");
+   premierClick=true;
+   return false;
+  }
+
+  public String collecterMotHorizontal() {
+   int i;
+   int longueurMot = AbscisseDestination-AbscisseOrigine+1;
+   String mot = "";
+   for(i=0; i<longueurMot; i++) {
+     mot+=plateau[OrdonneOrigine][AbscisseOrigine+i];
+   }
+   return mot;
+  }
+
+  public String collerMotVertical() {
+   String mot = "";
+   int i;
+   int longueurMot = OrdonneDestination-OrdonneOrigine+1;
+   for(i=0; i<longueurMot; i++) {
+     mot+=plateau[OrdonneOrigine+i][AbscisseOrigine];
+   }
+   return mot;
+  }
+
+  public String collerMotDiagonal() {
+   String mot = "";
+   int i;
+   int longueurMot = OrdonneDestination-OrdonneOrigine+1;
+   for(i=0; i<longueurMot; i++) {
+     mot+=plateau[OrdonneOrigine+i][AbscisseOrigine+i];
+   }
+   return mot;
+  }
+
+  public boolean verifierMot() {
+   String mot ="";
+   if(motHorizontal()) {
+     mot = collecterMotHorizontal();
+     if(motExiste(mot)) {
+       return true;
+     } else {
+       return false;
+     }
+   } else if(motVertical()) {
+     mot = collerMotVertical();
+     if(motExiste(mot)) {
+       return true;
+     } else {
+       return false;
+     }
+   } else {
+     mot = collerMotDiagonal();
+     if(motExiste(mot)) {
+       return true;
+     } else {
+       return false;
+     }
+   }
+  }
+
+  public void validerMot(int index) {
      Mot mot = liste.get(index);
      mot.check();
      if(mot.getOrientation() == 1){
@@ -180,6 +227,10 @@ public class Fenetre implements MouseListener {
      } else if(mot.getOrientation() == 2) {
        for(int i=0; i<mot.getTaille(); i++) {
          tabTextField[(mot.getX()+i) * largeur + mot.getY()].setBackground(new Color (128, 128, 0));
+       }
+     } else {
+       for(int i=0; i<mot.getTaille(); i++) {
+         tabTextField[(mot.getX()+i) * largeur + mot.getY()+i].setBackground(new Color (128, 128, 0));
        }
      }
    }
