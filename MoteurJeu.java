@@ -105,7 +105,7 @@ public class MoteurJeu {
       return false;
     }
     char[] tab = mot.toCharArray();
-    int orientation = (int)(Math.random() * 3)+1;
+    int orientation = (int)(Math.random() * 4)+1;
     int i = (int)(Math.random() *longueur);
     int j = (int)(Math.random() *largeur);
     int nombreTentative = 0;
@@ -123,15 +123,19 @@ public class MoteurJeu {
 
   public boolean motNeDepassePas(char[] tab, int orientation, int x, int y) {
     if(orientation == 1) {
-      if(y+tab.length >= this.largeur) {
+      if(y+tab.length >= this.longueur) {
         return false;
       }
     } else if(orientation == 2) {
-      if(x+tab.length >= this.longueur) {
+      if(x+tab.length >= this.largeur) {
         return false;
       }
     } else if(orientation == 3) {
-      if(x+tab.length >= this.longueur || y+tab.length >= this.largeur) {
+      if(x+tab.length >= this.largeur || y+tab.length >= this.longueur) {
+        return false;
+      }
+    } else if(orientation == 4) {
+      if(x+tab.length>this.largeur || y-tab.length < 0) {
         return false;
       }
     }
@@ -170,6 +174,15 @@ public class MoteurJeu {
       }
       mettreMot(3, tab, x, y);
       return true;
+    } else if (orientation == 4) {
+      for(int i=0; i<tab.length; i++) {
+        if(plateau[x+i][y-i] == tab[i] || plateau[x+i][y-i] == '-') {
+        } else {
+          return false;
+        }
+      }
+      mettreMot(4, tab, x, y);
+      return true;
     }
     return false;
   }
@@ -201,6 +214,14 @@ public class MoteurJeu {
     } else if (orientation == 3) {
       for(int i=0; i<tab.length; i++) {
         if(plateau[x+i][y+i] == tab[i] || plateau[x+i][y+i] == '-') {
+        } else {
+          return false;
+        }
+      }
+      return true;
+    } else if (orientation == 4) {
+      for(int i=0; i<tab.length; i++) {
+        if(plateau[x+i][y-i] == tab[i] || plateau[x+i][y-i] == '-') {
         } else {
           return false;
         }
@@ -239,7 +260,10 @@ public class MoteurJeu {
       for(int i=0; i<tab.length; i++) {
         plateau[x+i][y+i]=tab[i];
       }
-    } else {
+    } else if(orientation ==4) {
+      for(int i=0; i<tab.length; i++) {
+        plateau[x+i][y-i]=tab[i];
+      }
     }
   }
 
@@ -269,7 +293,7 @@ public class MoteurJeu {
   public int[] placerMotOrdonneReturnCoord(String mot) {
     int[] res = new int[4];
     int place;
-    res[3] = 4;
+    res[3] = -1;
     for(int i =0; i<this.longueur-1; i++) {
       for(int j = 0; j<this.largeur-1; j++) {
         if(leMotPeutEtreEcritSansEcrire(mot, 1, i, j)) {
@@ -291,6 +315,13 @@ public class MoteurJeu {
           res[1]=i;
           res[2]=j;
           res[3]=3;
+          return res;
+        }
+        if(leMotPeutEtreEcritSansEcrire(mot, 4, i, j)) {
+          res[0]=compterPlacePrise(4, mot.toCharArray(), i, j);
+          res[1]=i;
+          res[2]=j;
+          res[3]=4;
           return res;
         }
       }
@@ -321,6 +352,13 @@ public class MoteurJeu {
         }
       }
       return place;
+    } else if(orientation == 4) {
+      for(int i=0; i<tab.length; i++) {
+        if(plateau[x+i][y-i]!=tab[i]) {
+          place++;
+        }
+      }
+      return place;
     } else {
       System.out.println("MAUVAISE ORIENTATION");
     }
@@ -334,7 +372,7 @@ public class MoteurJeu {
     while(nombrePlaceRestante() != motFinal.toCharArray().length) {
       mot = lireMot();
       tab = placerMotOrdonneReturnCoord(mot);
-      while(tab[3]==4) {
+      while(tab[3]==-1) {
         mot = lireMot();
         tab = placerMotOrdonneReturnCoord(mot);
       }
